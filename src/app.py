@@ -11,23 +11,6 @@ CORS(app)
 # create the jackson family object
 jackson_family = FamilyStructure("Jackson")
 
-# Añadir miembros iniciales a la familia
-# jackson_family.add_member({
-#     "first_name": "John",
-#     "age": 33,
-#     "lucky_numbers": [7, 13, 22]
-# })
-# jackson_family.add_member({
-#     "first_name": "Jane",
-#     "age": 35,
-#     "lucky_numbers": [10, 14, 3]
-# })
-# jackson_family.add_member({
-#     "first_name": "Jimmy",
-#     "age": 5,
-#     "lucky_numbers": [1]
-# })
-
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -38,13 +21,15 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+
 @app.route('/member', methods=['POST'])
 def add_member():
     member = request.json
     if not member.get("id"):
         member["id"] = jackson_family._members[-1]["id"] + 1 if jackson_family._members else 1
     jackson_family.add_member(member)
-    return jsonify(member), 201
+    return jsonify(member), 200
+
 
 # Obtener un miembro específico por ID
 @app.route('/member/<int:id>', methods=['GET'])
@@ -54,10 +39,12 @@ def get_member(id):
         return jsonify(member), 200
     return jsonify({"error": "Member not found"}), 404
 
+
 @app.route('/members', methods=['GET'])
 def get_all_members():
     members = jackson_family.get_all_members()
     return jsonify(members), 200
+
 
 # Eliminar un miembro específico por ID
 @app.route('/member/<int:id>', methods=['DELETE'])
